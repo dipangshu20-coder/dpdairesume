@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DPD AI Resume — ATS Resume Builder India</title>
+<meta name="description" content="Build ATS-optimized professional resumes in minutes. AI-powered parsing, 6 premium templates, instant PDF download. Starting ₹19 only.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<style>
+:root {
+  --ink: #0f172a;
+  --ink2: #1e293b;
+  --ink3: #334155;
+  --muted: #475569;
+  --faint: #64748b;
+  --border: #334155;
+  --border2: #1e293b;
+  --text: #f1f5f9;
+  --text2: #cbd5e1;
+  --text3: #94a3b8;
+  --blue: #3b82f6;
+  --blue2: #2563eb;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --radius: 10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;font-size:14px}
+button{cursor:pointer;border:none;outline:none;font-family:inherit}
+input,textarea,select{font-family:inherit;outline:none;color:var(--text)}
+a{color:inherit;text-decoration:none}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--ink2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 20% 30%,#1e3a8a18 0%,transparent 60%),var(--ink);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;padding:20px;text-align:center}
+#splash.gone{display:none}
+.splash-logo{font-size:clamp(28px,6vw,52px);font-weight:900;letter-spacing:-1px;color:var(--text)}
+.splash-logo span{color:var(--blue)}
+.splash-sub{color:var(--text3);font-size:13px;max-width:360px;line-height:1.6}
+.splash-features{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.splash-feat{background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:11px;font-weight:600;color:var(--text2)}
+.btn-primary{background:var(--blue);color:#fff;font-weight:700;font-size:14px;padding:14px 36px;border-radius:10px;transition:.15s;letter-spacing:.3px}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px)}
+.btn-primary:active{transform:scale(.97)}
+.splash-trust{color:var(--faint);font-size:11px;margin-top:-8px}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--ink)/95%;backdrop-filter:blur(8px);border-bottom:1px solid var(--border2);padding:10px 16px;display:flex;align-items:center;gap:12px;-webkit-backdrop-filter:blur(8px)}
+.top-logo{font-weight:900;font-size:15px;letter-spacing:.3px}
+.top-logo span{color:var(--blue)}
+#subBadge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:3px 10px;border-radius:20px;background:var(--ink2);color:var(--text3);border:1px solid var(--border)}
+#subBadge.active{background:#064e3b;color:#6ee7b7;border-color:#065f46}
+.top-spacer{flex:1}
+.top-btn{background:var(--ink2);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;transition:.15s}
+.top-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* LAYOUT */
+#app{max-width:1700px;margin:0 auto;padding:70px 12px 16px;display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:1024px){#app{grid-template-columns:5fr 7fr}}
+
+/* LEFT PANEL */
+#leftPanel{background:var(--ink2);border:1px solid var(--border2);border-radius:14px;display:flex;flex-direction:column;height:calc(100vh - 84px);overflow:hidden;position:sticky;top:70px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);background:var(--ink);border-bottom:1px solid var(--border2)}
+.tab{padding:11px 4px;font-size:11px;font-weight:700;color:var(--text3);background:none;border-bottom:2px solid transparent;transition:.15s;letter-spacing:.2px}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tab:hover:not(.on){color:var(--text2)}
+.panel-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:80px}
+.panel{display:none}
+.panel.on{display:flex;flex-direction:column;gap:14px}
+
+/* CARDS */
+.card{background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:var(--radius);padding:14px}
+.card-upload{border-style:dashed;border-color:var(--blue2);background:rgba(59,130,246,.05);text-align:center;padding:18px}
+.card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:8px;display:block}
+.upload-hint{font-size:10px;color:var(--text3);font-style:italic;margin-top:6px}
+#parseStatus{font-size:10px;font-weight:700;margin-top:5px}
+
+/* FORM ELEMENTS */
+label.lbl{display:block;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+input[type=text],input[type=email],input[type=url],textarea,select{width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:12px;color:var(--text);transition:.15s}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+select option{background:var(--ink2)}
+textarea{resize:vertical;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column}
+
+/* SECTION HEADERS */
+.sec-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2);padding-bottom:10px;margin-bottom:2px}
+.sec-title{font-size:13px;font-weight:800;color:var(--text)}
+.btn-add{background:#064e3b;color:#6ee7b7;border:1px solid #065f46;padding:5px 12px;border-radius:7px;font-size:10px;font-weight:700;transition:.15s}
+.btn-add:hover{background:#065f46}
+.btn-del{background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;transition:.15s}
+.btn-del:hover{background:rgba(239,68,68,.2)}
+
+/* DYNAMIC CARDS */
+.dyn-card{background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:9px;padding:14px;position:relative}
+.dyn-del{position:absolute;top:8px;right:8px}
+
+/* AI BUTTONS */
+.btn-ai{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;padding:6px 14px;border-radius:7px;font-size:11px;font-weight:700;transition:.15s}
+.btn-ai:hover{background:linear-gradient(135deg,#1e40af,#2563eb)}
+
+/* BOTTOM BAR */
+#bottomBar{position:absolute;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid var(--border2);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;z-index:10}
+.btn-sync{background:linear-gradient(135deg,#92400e,#f59e0b);color:#fff;font-weight:700;font-size:11px;padding:12px;border-radius:8px;transition:.15s}
+.btn-sync:hover{opacity:.9}
+.btn-next{background:var(--blue);color:#fff;font-weight:700;font-size:11px;padding:12px;border-radius:8px;transition:.15s}
+.btn-next:hover{background:var(--blue2)}
+
+/* RIGHT PANEL */
+#rightPanel{display:flex;flex-direction:column;gap:12px}
+
+/* ATS SCORE */
+.ats-box{background:var(--ink2);border:1px solid var(--border2);border-radius:14px;padding:16px}
+.ats-top{display:grid;grid-template-columns:1fr 2fr auto;align-items:center;gap:12px}
+.ats-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:2px}
+.ats-heading{font-size:20px;font-weight:900;color:var(--text);line-height:1.1}
+.ats-bar-wrap{background:var(--ink);border-radius:99px;height:12px;border:1px solid var(--border2);overflow:hidden;padding:1px}
+#atsBar{height:100%;border-radius:99px;background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981);transition:width .4s ease;width:0%}
+.ats-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px}
+#atsFeedback{color:var(--text3)}
+#atsPct{font-weight:700;color:var(--text2)}
+#atsBadge{font-size:10px;font-weight:800;text-transform:uppercase;padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);white-space:nowrap}
+.ats-checks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid var(--border2);margin-top:12px;padding-top:12px}
+.ats-chk{font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px;color:#fca5a5}
+.ats-chk.pass{color:#6ee7b7}
+
+/* TEMPLATES */
+.tpl-box{background:var(--ink2);border:1px solid var(--border2);border-radius:14px;padding:14px}
+.tpl-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px}
+.tpl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.tpl-btn{padding:8px 4px;border-radius:7px;font-size:11px;font-weight:700;text-align:center;transition:.15s;border:2px solid transparent}
+.tpl-btn:hover{filter:brightness(1.15)}
+
+/* EXPORT */
+.export-row{display:flex;justify-content:flex-end}
+.btn-export{background:var(--blue);color:#fff;font-weight:700;font-size:12px;padding:10px 20px;border-radius:9px;display:flex;align-items:center;gap:8px;transition:.15s}
+.btn-export:hover{background:var(--blue2)}
+
+/* RESUME CANVAS */
+#canvasWrap{background:var(--ink2);border:1px solid var(--border2);border-radius:14px;overflow:hidden}
+#resumeCanvas{background:#fff;color:#1e293b;min-height:297mm;padding:32px 36px;font-family:system-ui,sans-serif;position:relative}
+
+/* PAYMENT MODAL */
+#payModal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:16px}
+#payModal.open{display:flex}
+.pay-box{background:var(--ink2);border:1px solid var(--border);border-radius:18px;padding:28px;max-width:420px;width:100%;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.pay-icon{width:44px;height:44px;background:rgba(59,130,246,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px}
+.pay-title{text-align:center;font-size:18px;font-weight:900;color:var(--text);margin-bottom:6px}
+.pay-sub{text-align:center;font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.5}
+.plan-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.plan-card{border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:.15s}
+.plan-card:hover{border-color:var(--blue)}
+.plan-card.sel-19{border-color:var(--blue);background:rgba(59,130,246,.08)}
+.plan-card.sel-59{border-color:var(--emerald);background:rgba(16,185,129,.07)}
+.plan-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.plan-desc{font-size:11px;color:var(--text3)}
+.plan-price{font-size:18px;font-weight:900;color:var(--blue)}
+.plan-price.green{color:var(--emerald)}
+.plan-per{font-size:9px;color:var(--text3);font-weight:600;text-align:right}
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-cancel{background:var(--ink3);color:var(--text2);font-size:12px;font-weight:700;padding:11px;border-radius:9px;transition:.15s}
+.btn-cancel:hover{background:var(--border)}
+.btn-pay{background:var(--blue);color:#fff;font-size:12px;font-weight:800;padding:11px;border-radius:9px;transition:.15s}
+.btn-pay:hover{background:var(--blue2)}
+
+/* PARSING OVERLAY */
+#parseOverlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.92);z-index:150;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#parseOverlay.on{display:flex}
+.spin{width:52px;height:52px;border:4px solid var(--blue);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.parse-title{color:var(--blue);font-weight:800;font-size:13px;letter-spacing:.5px}
+.parse-sub{color:var(--text3);font-size:11px;font-style:italic}
+
+/* SUCCESS BANNER */
+#successBanner{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:90;background:#064e3b;border:1px solid #065f46;color:#6ee7b7;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#successBanner.on{display:block}
+
+/* PRINT */
+@media print{
+  body{background:#fff!important;color:#000!important}
+  #splash,#topbar,#leftPanel,#payModal,#parseOverlay,#successBanner,.ats-box,.tpl-box,.export-row,#canvasWrap{all:unset!important}
+  #app{display:block!important;padding:0!important;max-width:100%!important}
+  #rightPanel{display:block!important}
+  #resumeCanvas{box-shadow:none!important;padding:10mm 12mm!important;min-height:auto!important}
+  @page{size:A4 portrait;margin:0}
+}
+
+/* WATERMARK */
+.canvas-watermark{position:absolute;bottom:8px;left:12px;font-size:7px;color:#94a3b8;font-family:system-ui,sans-serif;letter-spacing:.2px}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">DPD <span>AI</span> RESUME</div>
+  <p class="splash-sub">Build professional ATS-optimized resumes in minutes. Upload your old resume and our AI fills everything automatically.</p>
+  <div class="splash-features">
+    <span class="splash-feat">⚡ AI Resume Parsing</span>
+    <span class="splash-feat">📊 Live ATS Score</span>
+    <span class="splash-feat">🎨 6 Premium Templates</span>
+    <span class="splash-feat">📄 Instant PDF Export</span>
+  </div>
+  <button class="btn-primary" onclick="document.getElementById('splash').classList.add('gone')">Create My ATS Resume Free →</button>
+  <p class="splash-trust">✓ No signup required &nbsp;|&nbsp; ✓ Export from just ₹19 &nbsp;|&nbsp; ✓ Trusted by job seekers across India</p>
+</div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="top-logo">DPD <span>AI</span> RESUME</div>
+  <span id="subBadge">Checking...</span>
+  <div class="top-spacer"></div>
+  <button class="top-btn" onclick="openPay()">👑 Upgrade</button>
+</div>
+
+<!-- PARSE OVERLAY -->
+<div id="parseOverlay">
+  <div class="spin"></div>
+  <div class="parse-title">⚡ AI is parsing your resume...</div>
+  <div class="parse-sub" id="parseMsg">Running deep structural analysis...</div>
+</div>
+
+<!-- SUCCESS BANNER -->
+<div id="successBanner">🎉 Payment verified! Premium access activated.</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- LEFT PANEL -->
+  <div id="leftPanel">
+    <div class="tabs">
+      <button class="tab on" id="t1" onclick="gotoTab(1)">Personal</button>
+      <button class="tab" id="t2" onclick="gotoTab(2)">Summary</button>
+      <button class="tab" id="t3" onclick="gotoTab(3)">Experience</button>
+      <button class="tab" id="t4" onclick="gotoTab(4)">Education</button>
+      <button class="tab" id="t5" onclick="gotoTab(5)">Skills</button>
+    </div>
+
+    <div class="panel-body">
+
+      <!-- PANEL 1: PERSONAL -->
+      <div class="panel on" id="p1">
+        <div class="card card-upload">
+          <span class="card-label">📎 Upload Resume (Optional)</span>
+          <input type="file" id="fileIn" accept=".docx,.pdf,.txt" onchange="handleFile(event)" style="font-size:11px;color:var(--text3);width:100%">
+          <div class="upload-hint">AI auto-fills all fields from your existing resume (PDF, Word, TXT)</div>
+          <div id="parseStatus" style="color:var(--text3)"></div>
+        </div>
+        <div>
+          <div class="sec-head">
+            <span class="sec-title">👤 Personal Identity</span>
+            <button onclick="clearAll()" class="btn-del">🧹 Clear</button>
+          </div>
+        </div>
+        <div class="card" style="padding:12px">
+          <label class="lbl">Avatar Photo</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="file" id="photoIn" accept="image/*" onchange="handlePhoto(event)" style="flex:1;font-size:11px;color:var(--text3)">
+            <button onclick="removePhoto()" class="btn-del">Remove</button>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label class="lbl">Full Name</label><input type="text" id="fName" oninput="sync()" placeholder="John Doe"></div>
+          <div class="field"><label class="lbl">Target Designation</label><input type="text" id="fTitle" oninput="sync()" placeholder="Data Analyst"></div>
+          <div class="field"><label class="lbl">Email Address</label><input type="email" id="fEmail" oninput="sync()" placeholder="email@domain.com"></div>
+          <div class="field"><label class="lbl">Phone Number</label><input type="text" id="fPhone" oninput="sync()" placeholder="+91 98765 43210"></div>
+          <div class="field"><label class="lbl">LinkedIn Profile</label><input type="url" id="fLinkedIn" oninput="sync()" placeholder="linkedin.com/in/username"></div>
+          <div class="field"><label class="lbl">GitHub Portfolio</label><input type="url" id="fGitHub" oninput="sync()" placeholder="github.com/username"></div>
+          <div class="field"><label class="lbl">Father's Name</label><input type="text" id="fFather" oninput="sync()" placeholder="Father's Name"></div>
+          <div class="field"><label class="lbl">Location / City</label><input type="text" id="fAddress" oninput="sync()" placeholder="City, State, India"></div>
+          <div class="field"><label class="lbl">Gender</label><select id="fGender" onchange="sync()"><option value="">Select</option><option>Male</option><option>Female</option></select></div>
+          <div class="field"><label class="lbl">Date of Birth</label><input type="text" id="fDOB" oninput="sync()" placeholder="DD/MM/YYYY"></div>
+          <div class="field"><label class="lbl">Marital Status</label><select id="fMarital" onchange="sync()"><option value="">Select</option><option>Single</option><option>Married</option></select></div>
+          <div class="field"><label class="lbl">Expected Salary</label><input type="text" id="fSalary" oninput="sync()" placeholder="Negotiable"></div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: SUMMARY -->
+      <div class="panel" id="p2">
+        <div class="sec-head">
+          <span class="sec-title">📝 Career Summary</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="summaryTone" style="font-size:11px;padding:4px 8px;border-radius:6px;background:var(--ink);border:1px solid var(--border);color:var(--text2)">
+              <option>Executive</option><option>Technical</option><option>Creative</option>
+            </select>
+            <button class="btn-ai" onclick="aiSummary()">⚡ AI Generate</button>
+          </div>
+        </div>
+        <textarea id="fSummary" oninput="sync()" rows="10" placeholder="Write your professional summary here, or click AI Generate above..."></textarea>
+      </div>
+
+      <!-- PANEL 3: EXPERIENCE -->
+      <div class="panel" id="p3">
+        <div class="sec-head">
+          <span class="sec-title">💼 Work Experience</span>
+          <button class="btn-add" onclick="addExp()">＋ Add</button>
+        </div>
+        <div id="expWrap" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+
+      <!-- PANEL 4: EDUCATION -->
+      <div class="panel" id="p4">
+        <div class="sec-head">
+          <span class="sec-title">🎓 Education</span>
+          <button class="btn-add" onclick="addEdu()">＋ Add</button>
+        </div>
+        <div id="eduWrap" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+
+      <!-- PANEL 5: SKILLS -->
+      <div class="panel" id="p5">
+        <div class="sec-head"><span class="sec-title">🛠️ Skills & Certifications</span></div>
+        <div class="field">
+          <label class="lbl">Core Skills (comma separated)</label>
+          <input type="text" id="fSkills" oninput="sync()" placeholder="Power BI, SQL, Excel, Python, Oracle ERP">
+        </div>
+        <div class="sec-head" style="margin-top:8px">
+          <span class="sec-title" style="font-size:12px">📜 Certifications</span>
+          <button class="btn-add" onclick="addCert()">＋ Add</button>
+        </div>
+        <div id="certWrap" style="display:flex;flex-direction:column;gap:10px"></div>
+        <div style="margin-top:12px;border-top:1px solid var(--border2);padding-top:12px">
+          <label class="lbl">⚙️ Raw Resume Text (paste & parse)</label>
+          <textarea id="rawText" rows="6" style="font-size:11px;font-family:monospace" placeholder="Paste raw resume text here, then click Parse below..."></textarea>
+          <button onclick="runLocalParse()" style="margin-top:8px;width:100%;background:#064e3b;color:#6ee7b7;border:1px solid #065f46;padding:10px;border-radius:8px;font-size:11px;font-weight:700">⚡ Parse & Auto-Fill</button>
+        </div>
+      </div>
+
+    </div><!-- end panel-body -->
+
+    <div id="bottomBar">
+      <button class="btn-sync" onclick="fullSync()">🔄 Sync Changes</button>
+      <button class="btn-next" onclick="nextTab()">Next Step ➔</button>
+    </div>
+  </div><!-- end leftPanel -->
+
+  <!-- RIGHT PANEL -->
+  <div id="rightPanel">
+
+    <!-- ATS -->
+    <div class="ats-box">
+      <div class="ats-top">
+        <div>
+          <div class="ats-title">Live Scoring Analytics</div>
+          <div class="ats-heading">📊 ATS Score</div>
+        </div>
+        <div>
+          <div class="ats-bar-wrap"><div id="atsBar"></div></div>
+          <div class="ats-meta"><span id="atsFeedback">Fill your details to see score</span><span id="atsPct">0%</span></div>
+        </div>
+        <div><span id="atsBadge">Incomplete</span></div>
+      </div>
+      <div class="ats-checks">
+        <div class="ats-chk" id="chkName">❌ Name Blank</div>
+        <div class="ats-chk" id="chkSummary">❌ Summary Empty</div>
+        <div class="ats-chk" id="chkLinks">❌ Missing Links</div>
+        <div class="ats-chk" id="chkSkills">❌ Skills Empty</div>
+      </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <div class="tpl-box">
+      <div class="tpl-label">Select Design Template:</div>
+      <div class="tpl-grid">
+        <button onclick="setTpl(1)" id="tpl1" class="tpl-btn" style="background:#7f1d1d;color:#fff;border-color:#b91c1c">1. Crimson</button>
+        <button onclick="setTpl(2)" id="tpl2" class="tpl-btn" style="background:#1e3a8a;color:#fff;border-color:#1d4ed8">2. Navy</button>
+        <button onclick="setTpl(3)" id="tpl3" class="tpl-btn" style="background:#18181b;color:#e4e4e7;border-color:#3f3f46">3. Minimal</button>
+        <button onclick="setTpl(4)" id="tpl4" class="tpl-btn" style="background:#064e3b;color:#fff;border-color:#065f46">4. Tech</button>
+        <button onclick="setTpl(5)" id="tpl5" class="tpl-btn" style="background:#292524;color:#e7e5e4;border-color:#57534e">5. Retro</button>
+        <button onclick="setTpl(6)" id="tpl6" class="tpl-btn" style="background:#4c1d95;color:#fff;border-color:#6d28d9">6. Royal</button>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="export-row">
+      <button class="btn-export" onclick="tryExport()">💾 Export / Download PDF</button>
+    </div>
+
+    <!-- CANVAS -->
+    <div id="canvasWrap">
+      <div id="resumeCanvas">
+        <div id="canvasContent"></div>
+        <div class="canvas-watermark">DPD AI RESUME · dpdairesume.vercel.app</div>
+      </div>
+    </div>
+
+  </div><!-- end rightPanel -->
+</div><!-- end app -->
+
+<!-- PAYMENT MODAL -->
+<div id="payModal">
+  <div class="pay-box">
+    <div class="pay-icon">👑</div>
+    <div class="pay-title">Unlock Premium PDF Export</div>
+    <div class="pay-sub">Download your professionally formatted ATS resume as a PDF. One-time access pass.</div>
+    <div class="plan-cards">
+      <div class="plan-card sel-19" id="pc19" onclick="selPlan(19)">
+        <div>
+          <div class="plan-name">Weekly Access Pass</div>
+          <div class="plan-desc">Full PDF export access for 7 days</div>
+        </div>
+        <div>
+          <div class="plan-price">₹19</div>
+          <div class="plan-per">per week</div>
+        </div>
+      </div>
+      <div class="plan-card" id="pc59" onclick="selPlan(59)">
+        <div>
+          <div class="plan-name">Monthly Unlimited Access</div>
+          <div class="plan-desc">Unlimited downloads for 30 days</div>
+        </div>
+        <div>
+          <div class="plan-price green">₹59</div>
+          <div class="plan-per">per month</div>
+        </div>
+      </div>
+    </div>
+    <div class="pay-grid">
+      <button class="btn-cancel" onclick="closePay()">Cancel</button>
+      <button class="btn-pay" id="payBtn" onclick="doPay()">Pay ₹<span id="payAmt">19</span> →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+// YOUR RAZORPAY PAYMENT LINK URLS (set callback/redirect URL in Razorpay dashboard to: https://yourdomain.vercel.app/?dpd_paid=1&plan=PLAN)
+const PAY_LINKS = {
+  19: 'https://pages.razorpay.com/pl_T4ePkFXS642xAk/view',
+  59: 'https://pages.razorpay.com/pl_T4eeTV4c8OkGAk/view'
+};
+// Gemini API key (get a free one from Google AI Studio - set HTTP referrer restriction in Google Cloud Console)
+
+// Access token salt (change this to something unique/random)
+const TOKEN_SALT = 'dpd_resume_2024_salt_v2';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let S = {
+  tab: 1, tpl: 1, photo: '',
+  personal: { name:'',title:'',email:'',phone:'',linkedin:'',github:'',father:'',address:'',gender:'',dob:'',marital:'',salary:'' },
+  summary: '', skills: [], experience: [], education: [], certifications: [],
+  plan: 19
+};
+
+// ─── TABS ──────────────────────────────────────────────────────────────────
+function gotoTab(n) {
+  document.getElementById('p'+S.tab).classList.remove('on');
+  document.getElementById('t'+S.tab).classList.remove('on');
+  S.tab = n;
+  document.getElementById('p'+n).classList.add('on');
+  document.getElementById('t'+n).classList.add('on');
+}
+function nextTab() { gotoTab(S.tab < 5 ? S.tab + 1 : 1); }
+
+// ─── SYNC & RENDER ─────────────────────────────────────────────────────────
+function sync() { fullSync(); }
+function fullSync() {
+  S.personal.name    = v('fName');   S.personal.title   = v('fTitle');
+  S.personal.email   = v('fEmail');  S.personal.phone   = v('fPhone');
+  S.personal.linkedin= v('fLinkedIn');S.personal.github = v('fGitHub');
+  S.personal.father  = v('fFather'); S.personal.address = v('fAddress');
+  S.personal.gender  = v('fGender'); S.personal.dob     = v('fDOB');
+  S.personal.marital = v('fMarital');S.personal.salary  = v('fSalary');
+  S.summary = v('fSummary');
+  const rawSk = v('fSkills');
+  S.skills = rawSk ? rawSk.split(',').map(x=>x.trim()).filter(Boolean) : [];
+
+  // Read exp
+  S.experience = [];
+  document.querySelectorAll('#expWrap .dyn-card').forEach(c=>{
+    const ins = c.querySelectorAll('input,textarea');
+    if(ins.length>=4) S.experience.push({company:ins[0].value.trim(),role:ins[1].value.trim(),dates:ins[2].value.trim(),duties:ins[3].value.trim()});
+  });
+  // Read edu
+  S.education = [];
+  document.querySelectorAll('#eduWrap .dyn-card').forEach(c=>{
+    const ins = c.querySelectorAll('input');
+    if(ins.length>=3) S.education.push({school:ins[0].value.trim(),degree:ins[1].value.trim(),year:ins[2].value.trim()});
+  });
+  // Read cert
+  S.certifications = [];
+  document.querySelectorAll('#certWrap .dyn-card').forEach(c=>{
+    const ins = c.querySelectorAll('input');
+    if(ins.length>=2) S.certifications.push({name:ins[0].value.trim(),issuer:ins[1].value.trim()});
+  });
+
+  renderATS(); renderCanvas();
+  localStorage.setItem('dpd_draft', JSON.stringify(S));
+}
+function v(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─── ATS SCORE ─────────────────────────────────────────────────────────────
+function renderATS() {
+  let score = 0;
+  const chk = (id, pass, okText, failText) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(pass){el.className='ats-chk pass';el.innerText='✅ '+okText;score+=el.dataset.pts|0;}
+    else{el.className='ats-chk';el.innerText='❌ '+failText;}
+  };
+  document.getElementById('chkName').dataset.pts    = 20;
+  document.getElementById('chkSummary').dataset.pts = 25;
+  document.getElementById('chkLinks').dataset.pts   = 15;
+  document.getElementById('chkSkills').dataset.pts  = 15;
+  chk('chkName',    S.personal.name.length>2,    'Name Staged',   'Name Blank');
+  chk('chkSummary', S.summary.length>25,          'Summary Ready', 'Summary Empty');
+  chk('chkLinks',   S.personal.linkedin.length>5||S.personal.github.length>5,'Links Found','Missing Links');
+  chk('chkSkills',  S.skills.length>=1,           'Skills Mapped', 'Skills Empty');
+  const hasExp = S.experience.some(e=>(e.company||'').trim().length>1);
+  if(hasExp) score+=25;
+  score = Math.min(score,100);
+  document.getElementById('atsBar').style.width = score+'%';
+  document.getElementById('atsPct').innerText = score+'%';
+  const fb=document.getElementById('atsFeedback'), badge=document.getElementById('atsBadge');
+  if(score<45){
+    fb.innerText='Fill your details to boost ATS score';
+    badge.innerText='Incomplete';badge.style.cssText='font-size:10px;font-weight:800;text-transform:uppercase;padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);white-space:nowrap';
+  } else if(score<85){
+    fb.innerText='Good. Add more keywords to improve score.';
+    badge.innerText='Optimized';badge.style.cssText='font-size:10px;font-weight:800;text-transform:uppercase;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);white-space:nowrap';
+  } else {
+    fb.innerText='Excellent! Your resume is ATS-ready.';
+    badge.innerText='ATS Pass';badge.style.cssText='font-size:10px;font-weight:800;text-transform:uppercase;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3);white-space:nowrap';
+  }
+}
+
+// ─── TEMPLATES ─────────────────────────────────────────────────────────────
+function setTpl(n) {
+  // Reset all
+  const configs = {
+    1:{bg:'#7f1d1d',col:'#b91c1c',label:'1. Crimson'},
+    2:{bg:'#1e3a8a',col:'#1d4ed8',label:'2. Navy'},
+    3:{bg:'#18181b',col:'#3f3f46',label:'3. Minimal'},
+    4:{bg:'#064e3b',col:'#065f46',label:'4. Tech'},
+    5:{bg:'#292524',col:'#57534e',label:'5. Retro'},
+    6:{bg:'#4c1d95',col:'#6d28d9',label:'6. Royal'}
+  };
+  for(let i=1;i<=6;i++){
+    const btn=document.getElementById('tpl'+i);
+    if(btn) btn.style.outline='';
+  }
+  document.getElementById('tpl'+n).style.outline='3px solid #fff';
+  S.tpl=n;
+  const canvas=document.getElementById('resumeCanvas');
+  const fonts={1:'system-ui',2:'Georgia,serif',3:'monospace',4:'ui-sans-serif',5:'Garamond,serif',6:'system-ui'};
+  canvas.style.fontFamily=fonts[n]||'system-ui';
+  renderCanvas();
+}
+
+// ─── CANVAS RENDER ─────────────────────────────────────────────────────────
+const THEME_HEX = {1:'#b91c1c',2:'#1e3a8a',3:'#1f2937',4:'#065f46',5:'#44403c',6:'#6b21a8'};
+function sh(label) {
+  const hex = THEME_HEX[S.tpl]||'#b91c1c';
+  return `<h3 style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:${hex};border-bottom:1.5px solid #e2e8f0;padding-bottom:3px;margin-bottom:8px">${label}</h3>`;
+}
+function renderCanvas() {
+  const hex = THEME_HEX[S.tpl]||'#b91c1c';
+  const p = S.personal;
+  const name    = p.name    || 'YOUR NAME';
+  const title   = p.title   || 'Target Designation';
+  const email   = p.email   || 'email@domain.com';
+  const phone   = p.phone   || 'Contact No';
+  const address = p.address || 'Location';
+
+  // Photo HTML
+  let photoHTML = `<div style="width:88px;height:108px;background:#f1f5f9;border:1.5px solid #cbd5e1;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden"><span style="font-size:8px;color:#94a3b8;font-weight:700;text-align:center;text-transform:uppercase">No Photo</span></div>`;
+  if(S.photo) photoHTML = `<div style="width:88px;height:108px;border:1.5px solid ${hex};border-radius:4px;flex-shrink:0;overflow:hidden"><img src="${S.photo}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block"></div>`;
+
+  // Personal details row
+  let persDetails = '';
+  if(p.father)  persDetails += `<span><b>Father:</b> ${esc(p.father)}</span>`;
+  if(p.dob)     persDetails += `<span><b>DOB:</b> ${esc(p.dob)}</span>`;
+  if(p.gender)  persDetails += `<span><b>Gender:</b> ${esc(p.gender)}</span>`;
+  if(p.marital) persDetails += `<span><b>Status:</b> ${esc(p.marital)}</span>`;
+  if(p.salary)  persDetails += `<span><b>Expected Salary:</b> ${esc(p.salary)}</span>`;
+  let socialLine = '';
+  if(p.linkedin) socialLine += `<span>• <b>LinkedIn:</b> ${esc(p.linkedin)}</span>`;
+  if(p.github)   socialLine += ` <span>• <b>GitHub:</b> ${esc(p.github)}</span>`;
+
+  // Sections
+  let summaryHTML = S.summary ? `<div style="margin-bottom:16px">${sh('Professional Summary')}<p style="font-size:10.5px;color:#475569;line-height:1.7;text-align:justify">${esc(S.summary)}</p></div>` : '';
+
+  let expHTML = '';
+  const validExp = S.experience.filter(e=>e.company||e.role);
+  if(validExp.length) {
+    let items = validExp.map(e=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:#1e293b"><span>${esc(e.role||'Role')} — <span style="color:#334155">${esc(e.company||'Company')}</span></span><span style="color:#64748b;font-weight:400;font-size:10px">${esc(e.dates)}</span></div><p style="font-size:10px;color:#475569;line-height:1.7;margin-top:2px;padding-left:8px;border-left:2px solid #e2e8f0;text-align:justify">${esc(e.duties||'')}</p></div>`).join('');
+    expHTML = `<div style="margin-bottom:16px">${sh('Work Experience')}${items}</div>`;
+  }
+
+  let skillsHTML = '';
+  if(S.skills.length) {
+    skillsHTML = `<div style="margin-bottom:16px">${sh('Skills & Core Competencies')}<div style="display:flex;flex-wrap:wrap;gap:4px 16px">${S.skills.map(s=>`<span style="font-size:10px;color:#475569;font-weight:500">• ${esc(s)}</span>`).join('')}</div></div>`;
+  }
+
+  let certHTML = '';
+  const validCerts = S.certifications.filter(c=>c.name);
+  if(validCerts.length) {
+    certHTML = `<div style="margin-bottom:16px">${sh('Certifications')}${validCerts.map(c=>`<div style="font-size:10px;color:#475569;margin-bottom:3px">• <b style="color:#1e293b">${esc(c.name)}</b>${c.issuer?' — '+esc(c.issuer):''}</div>`).join('')}</div>`;
+  }
+
+  let eduHTML = '';
+  const validEdu = S.education.filter(e=>e.school||e.degree);
+  if(validEdu.length) {
+    eduHTML = `<div style="margin-bottom:16px">${sh('Education')}${validEdu.map(e=>`<div style="display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-bottom:4px"><span><b style="color:#1e293b">${esc(e.degree||'Degree')}</b> — ${esc(e.school||'University')}</span><span style="color:#94a3b8">${esc(e.year)}</span></div>`).join('')}</div>`;
+  }
+
+  // Two-column layout for templates 2 & 4
+  if(S.tpl===2 || S.tpl===4) {
+    document.getElementById('canvasContent').innerHTML = `
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:20px;min-height:250mm">
+        <div style="border-right:2px solid ${hex}22;padding-right:16px">
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:16px">${photoHTML}<div style="margin-top:10px"><h1 style="font-size:14px;font-weight:900;color:${hex};text-transform:uppercase;letter-spacing:.5px;line-height:1.2">${esc(name)}</h1><p style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${esc(title)}</p></div></div>
+          <div style="margin-bottom:14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:${hex};border-bottom:1px solid #e2e8f0;padding-bottom:2px;margin-bottom:6px">Contact</div><div style="font-size:9px;color:#475569;line-height:1.8">${esc(email)}<br>${esc(phone)}<br>${esc(address)}${p.linkedin?'<br>'+esc(p.linkedin):''}${p.github?'<br>'+esc(p.github):''}</div></div>
+          ${persDetails?`<div style="margin-bottom:14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:${hex};border-bottom:1px solid #e2e8f0;padding-bottom:2px;margin-bottom:6px">Personal</div><div style="font-size:9px;color:#475569;line-height:1.8">${persDetails.replace(/<span>/g,'').replace(/<\/span>/g,'<br>')}</div></div>`:''}
+          ${S.skills.length?`<div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:${hex};border-bottom:1px solid #e2e8f0;padding-bottom:2px;margin-bottom:6px">Skills</div><div style="font-size:9px;color:#475569;line-height:1.8">${S.skills.map(s=>`• ${esc(s)}`).join('<br>')}</div></div>`:''}
+        </div>
+        <div>${summaryHTML}${expHTML}${certHTML}${eduHTML}</div>
+      </div>`;
+  }
+  // Royal (banner header)
+  else if(S.tpl===6) {
+    document.getElementById('canvasContent').innerHTML = `
+      <div style="background:${hex};padding:20px 22px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;color:#fff">
+        <div>
+          <h1 style="font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:-0.5px">${esc(name)}</h1>
+          <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.85;margin-top:2px">${esc(title)}</p>
+          <div style="font-size:9px;opacity:.75;margin-top:8px;display:flex;flex-wrap:wrap;gap:0 12px">${esc(email)} · ${esc(phone)} · ${esc(address)}${socialLine?' '+socialLine:''}</div>
+        </div>
+        ${photoHTML}
+      </div>
+      ${persDetails?`<div style="display:flex;flex-wrap:wrap;gap:4px 20px;font-size:9px;color:#64748b;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:12px">${persDetails}</div>`:''}
+      ${summaryHTML}${expHTML}${skillsHTML}${certHTML}${eduHTML}`;
+  }
+  // Default (classic header with photo)
+  else {
+    document.getElementById('canvasContent').innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:18px;border-bottom:2.5px solid ${hex};padding-bottom:14px;margin-bottom:16px">
+        ${photoHTML}
+        <div style="flex:1;min-width:0">
+          <h1 style="font-size:22px;font-weight:900;text-transform:uppercase;color:${hex};letter-spacing:-0.5px;line-height:1.1">${esc(name)}</h1>
+          <p style="font-size:9.5px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">${esc(title)}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:2px 8px;font-size:9px;color:#475569;margin-top:8px;align-items:center">${esc(email)} <span style="color:#cbd5e1">•</span> ${esc(phone)} <span style="color:#cbd5e1">•</span> ${esc(address)}${socialLine?' '+socialLine:''}</div>
+          ${persDetails?`<div style="display:flex;flex-wrap:wrap;gap:3px 14px;font-size:9px;color:#94a3b8;margin-top:6px;padding-top:6px;border-top:1px dashed #e2e8f0">${persDetails}</div>`:''}
+        </div>
+      </div>
+      ${summaryHTML}${expHTML}${skillsHTML}${certHTML}${eduHTML}`;
+  }
+}
+
+// ─── DYNAMIC FORM BUILDERS ─────────────────────────────────────────────────
+function addExp(d={company:'',role:'',dates:'',duties:''}) {
+  const idx = document.querySelectorAll('#expWrap .dyn-card').length;
+  const div = document.createElement('div');
+  div.className='dyn-card';
+  div.innerHTML=`
+    <button class="btn-del dyn-del" onclick="this.closest('.dyn-card').remove();fullSync()">✕ Delete</button>
+    <div style="margin-bottom:8px"><label class="lbl">Company / Organization</label><input type="text" value="${esc(d.company)}" oninput="fullSync()" placeholder="Company Name" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text)"></div>
+    <div class="grid2" style="margin-bottom:8px">
+      <div><label class="lbl">Role / Title</label><input type="text" value="${esc(d.role)}" oninput="fullSync()" placeholder="Senior Analyst" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text)"></div>
+      <div><label class="lbl">Dates</label><input type="text" value="${esc(d.dates)}" oninput="fullSync()" placeholder="Jan 2020 – Present" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text)"></div>
+    </div>
+    <div><label class="lbl">Duties / Achievements</label><textarea oninput="fullSync()" rows="3" placeholder="Key responsibilities and achievements..." style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text)">${esc(d.duties)}</textarea></div>`;
+  document.getElementById('expWrap').appendChild(div);
+}
+
+function addEdu(d={school:'',degree:'',year:''}) {
+  const div = document.createElement('div');
+  div.className='dyn-card';
+  div.innerHTML=`
+    <button class="btn-del dyn-del" onclick="this.closest('.dyn-card').remove();fullSync()">✕ Delete</button>
+    <div style="margin-bottom:8px"><label class="lbl">University / Institute</label><input type="text" value="${esc(d.school)}" oninput="fullSync()" placeholder="University Name" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text)"></div>
+    <div class="grid2">
+      <div><label class="lbl">Degree / Course</label><input type="text" value="${esc(d.degree)}" oninput="fullSync()" placeholder="B.Com / MBA" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text)"></div>
+      <div><label class="lbl">Year</label><input type="text" value="${esc(d.year)}" oninput="fullSync()" placeholder="2022" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text)"></div>
+    </div>`;
+  document.getElementById('eduWrap').appendChild(div);
+}
+
+function addCert(d={name:'',issuer:''}) {
+  const div = document.createElement('div');
+  div.className='dyn-card';
+  div.style.padding='10px 12px';
+  div.innerHTML=`
+    <button class="btn-del dyn-del" style="top:6px;right:6px" onclick="this.closest('.dyn-card').remove();fullSync()">✕</button>
+    <div class="grid2" style="padding-top:4px">
+      <div><label class="lbl">Certification</label><input type="text" value="${esc(d.name)}" oninput="fullSync()" placeholder="AWS Solutions Architect" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:11px;color:var(--text)"></div>
+      <div><label class="lbl">Issuer</label><input type="text" value="${esc(d.issuer)}" oninput="fullSync()" placeholder="Amazon Web Services" style="width:100%;background:var(--ink);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:11px;color:var(--text)"></div>
+    </div>`;
+  document.getElementById('certWrap').appendChild(div);
+}
+
+// ─── FILE PARSING ──────────────────────────────────────────────────────────
+async function handleFile(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const fb = document.getElementById('parseStatus');
+  fb.style.color='#fcd34d'; fb.innerText='⏳ Extracting text...';
+  document.getElementById('parseOverlay').classList.add('on');
+  document.getElementById('parseMsg').innerText='Reading file...';
+
+  try {
+    let text = '';
+    if(file.name.toLowerCase().endsWith('.pdf')) {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise;
+      for(let p=1;p<=pdf.numPages;p++){
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        const lineMap={};
+        content.items.forEach(item=>{
+          const y=Math.round(item.transform[5]);
+          if(!lineMap[y]) lineMap[y]=[];
+          lineMap[y].push({x:item.transform[4],str:item.str});
+        });
+        Object.keys(lineMap).map(Number).sort((a,b)=>b-a).forEach(y=>{
+          const line=lineMap[y].sort((a,b)=>a.x-b.x).map(i=>i.str).join(' ').trim();
+          if(line) text+=line+'\n';
+        });
+        text+='\n';
+      }
+    } else if(file.name.toLowerCase().endsWith('.docx')) {
+      const buf = await file.arrayBuffer();
+      const res = await mammoth.extractRawText({arrayBuffer:buf});
+      text = res.value;
+    } else {
+      text = await file.text();
+    }
+    text = text.trim();
+    document.getElementById('rawText').value = text;
+
+    document.getElementById('parseMsg').innerText='Running AI analysis...';
+    await smartParse(text);
+    fb.style.color='#6ee7b7'; fb.innerText='✅ Resume parsed and filled!';
+  } catch(err) {
+    console.error(err);
+    fb.style.color='#fca5a5'; fb.innerText='❌ Error. Try pasting text manually.';
+  }
+  document.getElementById('parseOverlay').classList.remove('on');
+  e.target.value='';
+}
+
+async function smartParse(text) {
+  // Try Gemini via secure server proxy
+  try {
+    document.getElementById('parseMsg').innerText='Calling Gemini AI...';
+    const resp = await fetch('/api/gemini', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:`Parse this resume and return ONLY valid JSON (no markdown, no explanation) matching this schema exactly:\n{"personal":{"name":"","title":"","email":"","phone":"","linkedin":"","github":"","father":"","address":"","gender":"","dob":"","marital":"","salary":""},"summary":"","experience":[{"company":"","role":"","dates":"","duties":""}],"education":[{"school":"","degree":"","year":""}],"certifications":[{"name":"","issuer":""}],"skills":[]}\n\nResume:\n`+text}]}]})
+    });
+    if(resp.ok) {
+      const data = await resp.json();
+      const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+      const clean = raw.replace(/```json|```/gi,'').trim();
+      const parsed = JSON.parse(clean);
+      applyParsed(parsed);
+      return;
+    }
+  } catch(e) { console.warn('Gemini proxy failed, using local parser',e); }
+  // Fallback: local parser
+  document.getElementById('parseMsg').innerText='Using local parser...';
+  applyParsed(localParse(text));
+}
+
+function runLocalParse() {
+  const text = document.getElementById('rawText').value.trim();
+  if(!text){alert('Paste your resume text first.');return;}
+  document.getElementById('parseOverlay').classList.add('on');
+  document.getElementById('parseMsg').innerText='Parsing locally...';
+  setTimeout(()=>{
+    try{applyParsed(localParse(text));}catch(e){console.error(e);}
+    document.getElementById('parseOverlay').classList.remove('on');
+  },100);
+}
+
+// ─── LOCAL PARSER ──────────────────────────────────────────────────────────
+function localParse(raw) {
+  let text = raw.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  const lines = text.split('\n');
+  const up = text.toUpperCase();
+
+  // Find sections
+  const secs={};
+  const markers=[
+    {id:'SUMMARY',re:/SUMMARY|OBJECTIVE|PROFESSIONAL SUMMARY/i},
+    {id:'EXPERIENCE',re:/WORK EXPERIENCE|EXPERIENCE|EMPLOYMENT/i},
+    {id:'SKILLS',re:/KEY SKILLS|SKILLS|COMPETENCIES/i},
+    {id:'EDUCATION',re:/EDUCATION|ACADEMIC/i},
+    {id:'CERTIFICATIONS',re:/CERTIF/i}
+  ].map(m=>({...m,idx:text.search(m.re)})).filter(m=>m.idx>=0).sort((a,b)=>a.idx-b.idx);
+  markers.forEach((m,i)=>{
+    const end=markers[i+1]?markers[i+1].idx:text.length;
+    secs[m.id]=text.substring(m.idx,end);
+  });
+
+  // Personal info
+  let name='',title='';
+  for(let i=0;i<Math.min(lines.length,12);i++){
+    const l=lines[i].trim();
+    if(l.length>2&&l.length<50&&!/@/.test(l)&&!/^\+?\d/.test(l)&&!/RESUME|CV|CURRICULUM/i.test(l)){
+      if(!name){name=l;}else if(!title&&l.length<60&&!/FATHER|DOB|ADDRESS|PHONE/i.test(l)){title=l;break;}
+    }
+  }
+  const emailM=text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+  const phoneM=text.match(/(?:\+?91[\s\-]?)?[6-9]\d{9}\b/);
+  const liM=text.match(/linkedin\.com\/in\/[a-zA-Z0-9_\-]+/i);
+  const ghM=text.match(/github\.com\/[a-zA-Z0-9_\-]+/i);
+  const extractLabel=pats=>{
+    for(const p of pats){const m=text.match(new RegExp(p+'\\s*[:\\-—]\\s*([^\\n]{1,100})','i'));if(m)return m[1].trim();}
+    return '';
+  };
+  let father=extractLabel(["father'?s?\\s*name","father","guardian"]);
+  if(!father){const m=text.match(/(?:S\/O|D\/O|W\/O|SON OF)\s*[:\-—]?\s*([A-Za-z\s.]{3,40})/i);if(m)father=m[1].trim();}
+  const dob=extractLabel(['d\\.?o\\.?b\\.?','date\\s+of\\s+birth']);
+  const gRaw=extractLabel(['gender','sex']);
+  const gender=/female/i.test(gRaw)?'Female':/male/i.test(gRaw)?'Male':'';
+  const mRaw=extractLabel(['marital\\s+status','marital']);
+  const marital=/married/i.test(mRaw)?'Married':/single/i.test(mRaw)?'Single':'';
+  const salary=extractLabel(['expected\\s+salary','salary\\s+expected']);
+  let address=extractLabel(['address','location']);
+  if(!address){for(const l of lines){if(l.length>8&&l.length<100&&!/@/.test(l)&&(/india/i.test(l)||/\b\d{6}\b/.test(l)||/bengal|delhi|mumbai|nagar/i.test(l))){address=l;break;}}}
+
+  const summary=secs['SUMMARY']?secs['SUMMARY'].split('\n').slice(1).join(' ').replace(/\s+/g,' ').trim():'';
+  const skills=[];
+  if(secs['SKILLS']){secs['SKILLS'].split('\n').slice(1).forEach(r=>r.split(/[,|•;]/).forEach(t=>{const s=t.trim();if(s.length>1&&s.length<35)skills.push(s);}));}
+  const experience=[];
+  if(secs['EXPERIENCE']){const rows=secs['EXPERIENCE'].split('\n').slice(1).map(r=>r.trim()).filter(Boolean);let cur=null;rows.forEach(r=>{if(/Present|\d{4}/i.test(r)&&!r.startsWith('•')&&!r.startsWith('-')&&(r.includes('—')||r.includes('-'))){if(cur)experience.push(cur);const sl=r.split(/[—–|-]/);cur={company:sl[0].trim(),role:sl[0].trim(),dates:sl.slice(1).join('—').trim(),duties:''};}else if(cur){cur.duties+=(cur.duties?' ':'')+r.replace(/^[•\-*]\s*/,'');}});if(cur)experience.push(cur);}
+  const education=[];
+  if(secs['EDUCATION']){secs['EDUCATION'].split('\n').slice(1).map(r=>r.trim()).filter(Boolean).forEach(r=>{if(/\d{4}/.test(r)||/degree|bachelor|master|university|college/i.test(r)){const yr=r.match(/\d{4}/)?.[0]||'';const p=r.replace(/\d{4}/,'').split(/[—–|,]/);education.push({school:p.slice(1).join(', ').trim()||p[0].trim(),degree:p[0].trim(),year:yr});}});}
+  const certifications=[];
+  if(secs['CERTIFICATIONS']){secs['CERTIFICATIONS'].split('\n').slice(1).forEach(r=>{const p=r.replace(/^[•\-*]\s*/,'').split(/[—–|,]/);if(p[0].trim().length>2)certifications.push({name:p[0].trim(),issuer:p.slice(1).join(', ').trim()});});}
+  return {personal:{name,title,email:emailM?emailM[0]:'',phone:phoneM?phoneM[0]:'',linkedin:liM?liM[0]:'',github:ghM?ghM[0]:'',father,address,gender,dob,marital,salary},summary,skills,experience:experience.length?experience:[{company:'',role:'',dates:'',duties:''}],education:education.length?education:[{school:'',degree:'',year:''}],certifications};
+}
+
+function applyParsed(p) {
+  const src = p.personal || p;
+  S.personal = {
+    name:src.name||'', title:src.title||src.designation||'',
+    email:src.email||'', phone:src.phone||src.mobile||src.contact||'',
+    linkedin:src.linkedin||'', github:src.github||'',
+    father:src.father||src.fatherName||'', address:src.address||src.location||'',
+    gender:src.gender||'', dob:src.dob||src.dateOfBirth||'',
+    marital:src.marital||src.maritalStatus||'', salary:src.salary||''
+  };
+  S.summary = p.summary||'';
+  S.skills  = Array.isArray(p.skills)?p.skills:String(p.skills||'').split(',').map(v=>v.trim()).filter(Boolean);
+  S.experience    = Array.isArray(p.experience)?p.experience:[{company:'',role:'',dates:'',duties:''}];
+  S.education     = Array.isArray(p.education)?p.education:[{school:'',degree:'',year:''}];
+  S.certifications= Array.isArray(p.certifications)?p.certifications:[];
+
+  // Fill form
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
+  set('fName',S.personal.name); set('fTitle',S.personal.title);
+  set('fEmail',S.personal.email); set('fPhone',S.personal.phone);
+  set('fLinkedIn',S.personal.linkedin); set('fGitHub',S.personal.github);
+  set('fFather',S.personal.father); set('fAddress',S.personal.address);
+  set('fGender',S.personal.gender); set('fDOB',S.personal.dob);
+  set('fMarital',S.personal.marital); set('fSalary',S.personal.salary);
+  set('fSummary',S.summary);
+  set('fSkills',S.skills.join(', '));
+
+  document.getElementById('expWrap').innerHTML='';
+  S.experience.forEach(e=>addExp(e));
+  document.getElementById('eduWrap').innerHTML='';
+  S.education.forEach(e=>addEdu(e));
+  document.getElementById('certWrap').innerHTML='';
+  S.certifications.forEach(c=>addCert(c));
+
+  fullSync(); gotoTab(1);
+}
+
+// ─── PHOTO ─────────────────────────────────────────────────────────────────
+function handlePhoto(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader(); r.onload=ev=>{S.photo=ev.target.result;renderCanvas();}; r.readAsDataURL(file);
+}
+function removePhoto() { S.photo=''; if(document.getElementById('photoIn')) document.getElementById('photoIn').value=''; renderCanvas(); }
+
+// ─── AI SUMMARY ────────────────────────────────────────────────────────────
+async function aiSummary() {
+  const title = document.getElementById('fTitle').value||'Professional';
+  const skills= document.getElementById('fSkills').value||'';
+  const tone  = document.getElementById('summaryTone').value||'Executive';
+  document.getElementById('parseOverlay').classList.add('on');
+  document.getElementById('parseMsg').innerText='Generating AI summary...';
+  try {
+    try {
+      const resp = await fetch('/api/gemini', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text:`Write a 3-4 sentence ${tone} professional resume summary for a ${title} with skills: ${skills}. Return plain text only.`}]}]})
+      });
+      if(resp.ok) {
+        const data=await resp.json();
+        const txt=data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+        if(txt){document.getElementById('fSummary').value=txt.trim();fullSync();return;}
+      }
+    } catch(e){console.warn('AI summary failed',e);}
+    // Fallback
+    document.getElementById('fSummary').value=`Results-oriented ${title} with demonstrated expertise in ${skills||'core professional domains'}. Known for delivering measurable business impact through strategic thinking and cross-functional collaboration. Adept at leveraging data-driven insights to drive operational efficiency and continuous improvement.`;
+    fullSync();
+  } catch(e) { console.error(e); } finally {
+    document.getElementById('parseOverlay').classList.remove('on');
+  }
+}
+
+// ─── CLEAR ─────────────────────────────────────────────────────────────────
+function clearAll() {
+  if(!confirm('Clear all form data?')) return;
+  S.personal={name:'',title:'',email:'',phone:'',linkedin:'',github:'',father:'',address:'',gender:'',dob:'',marital:'',salary:''};
+  S.summary='';S.skills=[];S.experience=[];S.education=[];S.certifications=[];S.photo='';
+  ['fName','fTitle','fEmail','fPhone','fLinkedIn','fGitHub','fFather','fAddress','fDOB','fSalary','fSummary','fSkills','rawText'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['fGender','fMarital'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('expWrap').innerHTML='';
+  document.getElementById('eduWrap').innerHTML='';
+  document.getElementById('certWrap').innerHTML='';
+  addExp();addEdu();
+  localStorage.removeItem('dpd_draft');
+  fullSync();
+}
+
+// ─── PAYMENT & ACCESS ──────────────────────────────────────────────────────
+function hasAccess() {
+  const exp=localStorage.getItem('dpd_exp');
+  return exp && Date.now() < parseInt(exp,10);
+}
+function grantAccess(plan) {
+  const days = plan===59?30:7;
+  const exp  = Date.now() + days*24*60*60*1000;
+  localStorage.setItem('dpd_exp', String(exp));
+  localStorage.setItem('dpd_plan', String(plan));
+  updateBadge();
+}
+function updateBadge() {
+  const badge=document.getElementById('subBadge');
+  if(hasAccess()){
+    const left=Math.ceil((parseInt(localStorage.getItem('dpd_exp'),10)-Date.now())/(24*60*60*1000));
+    badge.innerText=`Premium · ${left}d left`;
+    badge.classList.add('active');
+  } else {
+    badge.innerText='Free Mode';
+    badge.classList.remove('active');
+  }
+}
+function openPay()  { document.getElementById('payModal').classList.add('open'); }
+function closePay() { document.getElementById('payModal').classList.remove('open'); }
+function selPlan(n) {
+  S.plan=n;
+  document.getElementById('payAmt').innerText=n;
+  const c19=document.getElementById('pc19'), c59=document.getElementById('pc59');
+  c19.className='plan-card'+(n===19?' sel-19':'');
+  c59.className='plan-card'+(n===59?' sel-59':'');
+}
+function doPay() {
+  localStorage.setItem('dpd_draft', JSON.stringify(S));
+  localStorage.setItem('dpd_chosen_plan', String(S.plan));
+  closePay();
+  // Open Razorpay payment link - they will redirect back with ?dpd_paid=1&plan=PLAN
+  window.location.href = PAY_LINKS[S.plan] || PAY_LINKS[19];
+}
+function tryExport() {
+  if(hasAccess()){
+    window.print();
+  } else {
+    openPay();
+  }
+}
+
+// ─── CHECK RETURN FROM PAYMENT ─────────────────────────────────────────────
+function checkPaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  // Razorpay returns ?dpd_paid=1&plan=19 (set this as callback URL in Razorpay dashboard)
+  const paid   = params.get('dpd_paid')||params.get('status');
+  const plan   = parseInt(params.get('plan')||localStorage.getItem('dpd_chosen_plan')||'19',10);
+  // Also check Razorpay native params
+  const rpId   = params.get('razorpay_payment_id')||params.get('payment_link_payment_id');
+  if((paid==='1'||paid==='success'||rpId) && !hasAccess()) {
+    grantAccess(plan);
+    const banner=document.getElementById('successBanner');
+    banner.innerText=`🎉 Payment successful! Premium access active for ${plan===59?'30':'7'} days.`;
+    banner.classList.add('on');
+    setTimeout(()=>banner.classList.remove('on'),6000);
+    window.history.replaceState({},document.title,window.location.pathname);
+    // Auto-trigger print
+    setTimeout(()=>window.print(),800);
+  }
+}
+
+// ─── RESTORE DRAFT ─────────────────────────────────────────────────────────
+function restoreDraft() {
+  try {
+    const saved = localStorage.getItem('dpd_draft');
+    if(!saved) return;
+    const d = JSON.parse(saved);
+    if(!d||typeof d!=='object') return;
+    if(d.personal) Object.assign(S.personal, d.personal);
+    if(d.summary)  S.summary=d.summary;
+    if(Array.isArray(d.skills))        S.skills=d.skills;
+    if(Array.isArray(d.experience))    S.experience=d.experience;
+    if(Array.isArray(d.education))     S.education=d.education;
+    if(Array.isArray(d.certifications))S.certifications=d.certifications;
+    if(d.photo) S.photo=d.photo;
+    if(d.tpl)   S.tpl=d.tpl;
+    // Fill fields
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
+    set('fName',S.personal.name); set('fTitle',S.personal.title);
+    set('fEmail',S.personal.email); set('fPhone',S.personal.phone);
+    set('fLinkedIn',S.personal.linkedin); set('fGitHub',S.personal.github);
+    set('fFather',S.personal.father); set('fAddress',S.personal.address);
+    set('fGender',S.personal.gender); set('fDOB',S.personal.dob);
+    set('fMarital',S.personal.marital); set('fSalary',S.personal.salary);
+    set('fSummary',S.summary); set('fSkills',S.skills.join(', '));
+    S.experience.forEach(e=>addExp(e));
+    S.education.forEach(e=>addEdu(e));
+    S.certifications.forEach(c=>addCert(c));
+  } catch(e) { console.error('Draft restore error:',e); }
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+window.onload = function() {
+  restoreDraft();
+  if(!S.experience.length) addExp();
+  if(!S.education.length)  addEdu();
+  if(S.tpl && S.tpl!==1) setTpl(S.tpl);
+  fullSync();
+  updateBadge();
+  checkPaymentReturn();
+};
+</script>
+</body>
+</html>
