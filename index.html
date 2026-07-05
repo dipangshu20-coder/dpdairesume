@@ -24,11 +24,8 @@
             * { -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
             body { background:#ffffff!important;color:#1e293b!important;padding:0!important;margin:0!important; }
             .no-print { display:none!important; }
-            /* Hide everything except the resume canvas */
-            body > *:not(#dpdPrintRoot) { display:none!important; }
-            .print-full-width { width:210mm!important;max-width:210mm!important;box-shadow:none!important;margin:0 auto!important; }
-            /* Canvas keeps exact same padding as screen — p-10 = 40px = ~10.5mm */
-            .resume-print-canvas { min-height:auto!important;box-shadow:none!important;display:block!important;padding:10mm 12mm!important;width:210mm!important;margin:0 auto!important; }
+            .print-full-width { width:100%!important;max-width:100%!important;box-shadow:none!important;margin:0!important; }
+            .resume-print-canvas { min-height:auto!important;box-shadow:none!important;display:block!important;padding:10mm 12mm!important; }
             #dpdWatermark { display:none!important; }
             #canvasDocumentRenderTree { padding:0!important; }
             @page { size: A4 portrait; margin: 0; }
