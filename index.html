@@ -26,10 +26,9 @@
             .no-print { display:none!important; }
             #dpdPrintRoot { padding:0!important;margin:0!important;overflow:visible!important;border-radius:0!important; }
             .print-full-width { width:100%!important;max-width:100%!important;box-shadow:none!important;margin:0!important;padding:0!important; }
-            .resume-print-canvas { min-height:auto!important;box-shadow:none!important;display:block!important;padding:0!important;border-radius:0!important; }
+            .resume-print-canvas { min-height:auto!important;box-shadow:none!important;display:block!important;border-radius:0!important; }
             #dpdWatermark { display:none!important; }
-            #canvasDocumentRenderTree { padding:0!important;margin:0!important; }
-            @page { size: A4 portrait; margin: 12mm 14mm; }
+            @page { size: A4 portrait; margin: 0; }
         }
         #parsingOverlay { display:none; }
         #parsingOverlay.active { display:flex; }
@@ -999,7 +998,7 @@ function removePhotoImage() { engineState.globalCachedProfileImageStream=""; if(
 function displaySubscriptionGateway() {
     if (checkActiveSubscriptionPass()) {
         alert('✅ Subscription active. You can download or print your resume now.');
-        window.print();
+        dpdSmartPrint();
         return;
     }
     const modal = document.getElementById('subscriptionModalGate');
@@ -1129,6 +1128,43 @@ function showVerifyError(msg) {
 }
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+
+// Smart print — measures screen canvas position and replicates it exactly in print
+function dpdSmartPrint() {
+    const canvas = document.getElementById('printTargetSandbox');
+    if (!canvas) { window.print(); return; }
+
+    // Measure exact position on screen
+    const rect = canvas.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const canvasTop = rect.top + scrollTop;
+
+    // Get computed padding of canvas on screen
+    const style = window.getComputedStyle(canvas);
+    const pt = style.paddingTop;
+    const pr = style.paddingRight;
+    const pb = style.paddingBottom;
+    const pl = style.paddingLeft;
+
+    // Inject a temporary print style that exactly matches screen padding
+    const styleTag = document.createElement('style');
+    styleTag.id = 'dpd-print-override';
+    styleTag.innerHTML = `@media print {
+        .resume-print-canvas {
+            padding: ${pt} ${pr} ${pb} ${pl} !important;
+        }
+    }`;
+    document.head.appendChild(styleTag);
+
+    window.print();
+
+    // Clean up after print dialog closes
+    setTimeout(() => {
+        const old = document.getElementById('dpd-print-override');
+        if (old) old.remove();
+    }, 3000);
+}
 
 window.onload = async function() {
 
