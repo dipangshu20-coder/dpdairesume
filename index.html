@@ -60,6 +60,11 @@
         🎉 Payment successful! Premium access activated.
     </div>
 
+    <!-- ONE-TIME PRE-PRINT TIP: Chrome/Edge add their own header/footer margin unless the user disables it in the print dialog. No CSS can override this browser dialog setting, so we surface a clear instruction right before print opens. -->
+    <div id="printTipBanner" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-blue-950 border border-blue-600 text-blue-100 px-5 py-4 rounded-xl text-xs font-semibold shadow-2xl no-print max-w-sm text-center">
+        📌 For a perfect print/PDF layout: in the print window, click <strong>"More settings"</strong>, set <strong>Margins → None</strong>, and <strong>uncheck "Headers and footers"</strong>. This is a one-time browser setting.
+    </div>
+
     <div class="max-w-[1700px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-4 print:block" style="padding-top:56px">
 
         <div class="xl:col-span-5 bg-slate-800 rounded-xl border border-slate-700 flex flex-col overflow-hidden no-print relative" style="height:calc(100vh - 64px);position:sticky;top:60px">
@@ -1109,7 +1114,7 @@ async function verifyPaymentAndActivate() {
                 banner.classList.remove('hidden');
                 setTimeout(() => banner.classList.add('hidden'), 7000);
             }
-            setTimeout(() => window.print(), 800);
+            setTimeout(() => dpdSmartPrint(), 800);
         } else {
             showVerifyError(data.error || 'Payment ID not found. Please check and try again.');
             btn.innerText = 'Activate Access ✓';
@@ -1129,41 +1134,27 @@ function showVerifyError(msg) {
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+// One-time-per-visit reminder: browsers reserve extra top/bottom space for their own
+// print header/footer (page title, URL, date, page number) unless the user disables it
+// in the print dialog's "More settings" panel. No CSS can override this — @page margin
+// only controls the page margin, not the header/footer reservation. So instead of
+// fighting it with more padding guesses, we surface the one real fix to the user.
+let dpdPrintTipShownThisSession = false;
+function showPrintTipThenPrint(afterDelayMs, printFn) {
+    const tip = document.getElementById('printTipBanner');
+    if (tip && !dpdPrintTipShownThisSession) {
+        dpdPrintTipShownThisSession = true;
+        tip.classList.remove('hidden');
+        setTimeout(() => tip.classList.add('hidden'), 6000);
+    }
+    setTimeout(printFn, afterDelayMs);
+}
 
-// Smart print — measures screen canvas position and replicates it exactly in print
+// Smart print — shows the one-time browser-settings tip, then opens the print dialog.
+// (Padding/margin on the resume canvas itself is already correctly zeroed for print
+// via the @media print rules in <style>; no extra JS padding injection is needed or used.)
 function dpdSmartPrint() {
-    const canvas = document.getElementById('printTargetSandbox');
-    if (!canvas) { window.print(); return; }
-
-    // Measure exact position on screen
-    const rect = canvas.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const canvasTop = rect.top + scrollTop;
-
-    // Get computed padding of canvas on screen
-    const style = window.getComputedStyle(canvas);
-    const pt = style.paddingTop;
-    const pr = style.paddingRight;
-    const pb = style.paddingBottom;
-    const pl = style.paddingLeft;
-
-    // Inject a temporary print style that exactly matches screen padding
-    const styleTag = document.createElement('style');
-    styleTag.id = 'dpd-print-override';
-    styleTag.innerHTML = `@media print {
-        .resume-print-canvas {
-            padding: ${pt} ${pr} ${pb} ${pl} !important;
-        }
-    }`;
-    document.head.appendChild(styleTag);
-
-    window.print();
-
-    // Clean up after print dialog closes
-    setTimeout(() => {
-        const old = document.getElementById('dpd-print-override');
-        if (old) old.remove();
-    }, 3000);
+    showPrintTipThenPrint(400, () => window.print());
 }
 
 window.onload = async function() {
@@ -1269,7 +1260,7 @@ window.onload = async function() {
             banner.classList.remove('hidden');
             setTimeout(() => banner.classList.add('hidden'), 8000);
         }
-        setTimeout(() => window.print(), 1200);
+        showPrintTipThenPrint(1200, () => window.print());
     }
 
     renderSubscriptionStatusIndicator();
